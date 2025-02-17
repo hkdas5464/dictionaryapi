@@ -1,5 +1,8 @@
 
 
+import SaveButton from '@/components/SaveButton';
+import { Button } from '@heroui/button';
+import { Input } from '@heroui/input';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
@@ -62,40 +65,40 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
      
       <div className="absolute top-4 right-4">
         <Link
         href={"words"}
 
           onClick={() => setDarkMode(!darkMode)}
-          className="bg-gray-800 p-2 rounded hover:bg-gray-700"
+          className="p-2"
         >
-          Save Words
-        </Link>
+      <SaveButton />
+      </Link>
       </div>
-      <h1 className="text-4xl font-bold mb-8">Dictionary App</h1>
-      <form onSubmit={handleSearch} className="mb-8 flex">
-        <input
+      <h1 className="mb-8 text-4xl font-bold">Harendra Dictionary App</h1>
+      <form onSubmit={handleSearch} className="flex mb-8">
+        <Input
           type="text"
           value={word}
           onChange={(e) => setWord(e.target.value)}
           placeholder="Enter a word"
-          className="p-2 rounded-l-lg text-black focus:outline-none"
+          className="text-black rounded-l-lg  focus:outline-none"
         />
-        <button type="submit" className="bg-blue-600 p-2 rounded-r-lg hover:bg-blue-700">
+        <Button type="submit" className="p-2 bg-blue-600 rounded-r-lg hover:bg-blue-700">
           Search
-        </button>
+        </Button>
       </form>
       {error && <p className="text-red-500">{error}</p>}
       {definition && (
         <>
           <div className="max-w-xl text-left">
-            <h2 className="text-2xl font-bold mb-4">{definition.word}</h2>
+            <h2 className="mb-4 text-2xl font-bold">{definition.word}</h2>
             {definition.meanings.map((meaning, idx) => (
               <div key={idx} className="mb-4">
                 <p className="italic">{meaning.partOfSpeech}</p>
-                <ul className="list-disc ml-6">
+                <ul className="ml-6 list-disc">
                   {meaning.definitions.map((def, i) => (
                     <li key={i} className="mb-1">{def.definition}</li>
                   ))}
@@ -105,7 +108,7 @@ export default function Home() {
           </div>
           <button
             onClick={handleSaveWord}
-            className="mt-4 bg-green-500 p-2 rounded hover:bg-green-600"
+            className="p-2 mt-4 bg-green-500 rounded hover:bg-green-600"
           >
             Save Word
           </button>

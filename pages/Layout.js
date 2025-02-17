@@ -1,6 +1,5 @@
 // app/layout.js
 import ThemeProvider from '../components/ThemeProvider';
-import '../styles/globals.css';
 
 export const metadata = {
   title: 'Your App Title',

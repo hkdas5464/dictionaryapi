@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 export default function WordsPage() {
@@ -82,17 +83,18 @@ export default function WordsPage() {
 
   return (
     <div className="min-h-screen bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] p-4">
-      <div className="pattern-diagonal-lines text-gray-700 p-4">
-        <h1 className="text-4xl font-bold text-center mb-8">Saved Words</h1>
+      <div className="p-4 text-gray-700 pattern-diagonal-lines">
+       
+       <Link href={"/"}> <h1 className="mb-8 text-4xl font-bold text-center">Saved Words</h1></Link>
         {message && (
-          <div className="bg-green-100 text-green-800 px-4 py-2 rounded mb-4 text-center">
+          <div className="px-4 py-2 mb-4 text-center text-green-800 bg-green-100 rounded">
             {message}
           </div>
         )}
         {words.length > 0 ? (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {words.map((item) => (
-              <div key={item._id} className="bg-white shadow rounded-lg p-6">
+              <div key={item._id} className="p-6 bg-white rounded-lg shadow">
                 {editingId === item._id ? (
                   <div>
                     <input
@@ -100,24 +102,24 @@ export default function WordsPage() {
                       value={editWord}
                       onChange={(e) => setEditWord(e.target.value)}
                       placeholder="Word"
-                      className="w-full border rounded px-3 py-2 mb-2 focus:outline-none focus:ring focus:border-blue-300"
+                      className="w-full px-3 py-2 mb-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
                     />
                     <textarea
                       value={editDefinition}
                       onChange={(e) => setEditDefinition(e.target.value)}
                       placeholder="Definition"
-                      className="w-full border rounded px-3 py-2 mb-2 focus:outline-none focus:ring focus:border-blue-300"
+                      className="w-full px-3 py-2 mb-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
                     />
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => handleUpdate(item._id)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
+                        className="px-4 py-2 text-white transition-colors bg-blue-500 rounded hover:bg-blue-600"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
+                        className="px-4 py-2 text-white transition-colors bg-gray-500 rounded hover:bg-gray-600"
                       >
                         Cancel
                       </button>
@@ -125,8 +127,8 @@ export default function WordsPage() {
                   </div>
                 ) : (
                   <div>
-                    <h2 className="text-2xl font-semibold mb-2">{item.word}</h2>
-                    <p className="text-gray-700 mb-4">{item.definition}</p>
+                    <h2 className="mb-2 text-2xl font-semibold">{item.word}</h2>
+                    <p className="mb-4 text-gray-700">{item.definition}</p>
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => {
@@ -134,13 +136,13 @@ export default function WordsPage() {
                           setEditWord(item.word);
                           setEditDefinition(item.definition);
                         }}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded transition-colors"
+                        className="px-4 py-2 text-white transition-colors bg-yellow-500 rounded hover:bg-yellow-600"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(item._id)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+                        className="px-4 py-2 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
                       >
                         Delete
                       </button>

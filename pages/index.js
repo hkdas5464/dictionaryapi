@@ -1,7 +1,6 @@
 
 
-import SaveButton from '@/components/SaveButton';
-import { Button } from '@heroui/button';
+import { Button, ButtonGroup } from '@heroui/button';
 import { Input } from '@heroui/input';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -74,7 +73,7 @@ export default function Home() {
           onClick={() => setDarkMode(!darkMode)}
           className="p-2"
         >
-      <SaveButton />
+      <Button >Save Words</Button>
       </Link>
       </div>
       <h1 className="mb-8 text-4xl font-bold">Harendra Dictionary App</h1>
@@ -84,7 +83,7 @@ export default function Home() {
           value={word}
           onChange={(e) => setWord(e.target.value)}
           placeholder="Enter a word"
-          className="text-black rounded-l-lg  focus:outline-none"
+          className="text-black rounded-l-lg focus:outline-none"
         />
         <Button type="submit" className="p-2 bg-blue-600 rounded-r-lg hover:bg-blue-700">
           Search

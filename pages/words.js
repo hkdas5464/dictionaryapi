@@ -1,5 +1,10 @@
+import { Button } from '@heroui/button';
+import { Input, Textarea } from '@heroui/input';
+import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { title } from '@/components/primitives';
+import { Divider } from '@heroui/divider';
 
 export default function WordsPage() {
   const [words, setWords] = useState([]);
@@ -7,6 +12,7 @@ export default function WordsPage() {
   const [editWord, setEditWord] = useState('');
   const [editDefinition, setEditDefinition] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
 
   // Fetch saved words from API
   const fetchWords = async () => {
@@ -21,7 +27,6 @@ export default function WordsPage() {
         console.log('Fetched words:', data.words);
         setWords(data.words || []);
       } else {
-        // If response is not JSON, log the text to diagnose the issue
         const text = await res.text();
         console.error('Expected JSON, got:', text);
         setMessage('Invalid data received from server');
@@ -41,51 +46,65 @@ export default function WordsPage() {
     try {
       const res = await fetch(`/api/words/${id}`, { method: 'DELETE' });
       if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Deletion error response:', errorData);
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
       if (data.success) {
-        setMessage('Word deleted successfully');
-        fetchWords();
+        setWords(words.filter((word) => word._id !== id));
       } else {
-        setMessage(data.error || 'Failed to delete word');
+        console.error('Deletion unsuccessful:', data.message);
       }
-    } catch (error) {
-      console.error('Error deleting word:', error);
-      setMessage('Error deleting word');
+    } catch (err) {
+      setError(err.message);
+      console.error('Error deleting word:', err);
     }
   };
 
-  // Update a word
-  const handleUpdate = async (id) => {
+  // Update (edit) a word
+  const handleUpdate = async (id, updatedData) => {
+    if (!updatedData || !updatedData.word || !updatedData.definition) {
+      setError("Word and definition are required for update.");
+      return;
+    }
+
     try {
       const res = await fetch(`/api/words/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: editWord, definition: editDefinition }),
+        body: JSON.stringify(updatedData),
       });
       if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Update error response:', errorData);
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
       if (data.success) {
-        setMessage('Word updated successfully');
+        setWords(
+          words.map((word) =>
+            word._id === id ? { ...word, ...updatedData } : word
+          )
+        );
         setEditingId(null);
-        fetchWords();
+        setEditWord('');
+        setEditDefinition('');
       } else {
-        setMessage(data.error || 'Failed to update word');
+        console.error('Update unsuccessful:', data.message);
       }
-    } catch (error) {
-      console.error('Error updating word:', error);
-      setMessage('Error updating word');
+    } catch (err) {
+      setError(err.message);
+      console.error('Error updating word:', err);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] p-4">
-      <div className="p-4 text-gray-700 pattern-diagonal-lines">
-       
-       <Link href={"/"}> <h1 className="mb-8 text-4xl font-bold text-center">Saved Words</h1></Link>
+    <div className="min-h-screen p-8 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500">
+      <div className="p-6 bg-white rounded-lg shadow-xl bg-opacity-80">
+        <Link href="/">
+          <h1 className="mb-8 text-4xl font-bold text-center"> <span className={title({ color: "blue" })}>Saved Words</span></h1>
+        </Link>
         {message && (
           <div className="px-4 py-2 mb-4 text-center text-green-800 bg-green-100 rounded">
             {message}
@@ -93,63 +112,83 @@ export default function WordsPage() {
         )}
         {words.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {words.map((item) => (
-              <div key={item._id} className="p-6 bg-white rounded-lg shadow">
+            {words.map((item,index) => (
+              <Card
+                key={item._id}
+                className="text-white shadow-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-400"
+              >
                 {editingId === item._id ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={editWord}
-                      onChange={(e) => setEditWord(e.target.value)}
-                      placeholder="Word"
-                      className="w-full px-3 py-2 mb-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                    <textarea
-                      value={editDefinition}
-                      onChange={(e) => setEditDefinition(e.target.value)}
-                      placeholder="Definition"
-                      className="w-full px-3 py-2 mb-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        onClick={() => handleUpdate(item._id)}
-                        className="px-4 py-2 text-white transition-colors bg-blue-500 rounded hover:bg-blue-600"
+                  <>
+                    <CardHeader>
+                      <Input
+                        type="text"
+                        value={editWord}
+                        onChange={(e) => setEditWord(e.target.value)}
+                        placeholder="Word"
+                      />
+                    </CardHeader>
+                    <CardBody>
+                      <Textarea
+                        value={editDefinition}
+                        onChange={(e) => setEditDefinition(e.target.value)}
+                        placeholder="Definition"
+                        className="max-w-xs"
+                      />
+                    </CardBody>
+                    <CardFooter className="flex justify-end space-x-2">
+                      <Button
+                        onClick={() =>
+                          handleUpdate(item._id, {
+                            word: editWord,
+                            definition: editDefinition,
+                          })
+                        }
+                        color='success'
                       >
                         Save
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setEditingId(null)}
-                        className="px-4 py-2 text-white transition-colors bg-gray-500 rounded hover:bg-gray-600"
+                        color='default'
                       >
                         Cancel
-                      </button>
-                    </div>
-                  </div>
+                      </Button>
+                    </CardFooter>
+                  </>
                 ) : (
-                  <div>
-                    <h2 className="mb-2 text-2xl font-semibold">{item.word}</h2>
-                    <p className="mb-4 text-gray-700">{item.definition}</p>
-                    <div className="flex justify-end space-x-2">
-                      <button
+                  <>
+
+                  
+                    <CardHeader className="flex gap-3 text-center">
+                      <h2 className={title({ size: "sm" })}><span className='text-black'>{index+1} )</span> {item.word}</h2>
+
+                    </CardHeader>
+                    <Divider />
+
+                    <CardBody>
+                      <p className="text-gray-200">{item.definition}</p>
+                    </CardBody>
+                    <CardFooter className="flex justify-end space-x-2">
+                      <Button
                         onClick={() => {
                           setEditingId(item._id);
                           setEditWord(item.word);
                           setEditDefinition(item.definition);
                         }}
-                        className="px-4 py-2 text-white transition-colors bg-yellow-500 rounded hover:bg-yellow-600"
+                        color="warning"
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => handleDelete(item._id)}
-                        className="px-4 py-2 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
+                        color="danger"
                       >
                         Delete
-                      </button>
-                    </div>
-                  </div>
+                      </Button>
+                    </CardFooter>
+                  </>
                 )}
-              </div>
+              </Card>
             ))}
           </div>
         ) : (

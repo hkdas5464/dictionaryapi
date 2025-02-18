@@ -4,6 +4,7 @@ import { Button, ButtonGroup } from '@heroui/button';
 import { Input } from '@heroui/input';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { title, subtitle } from "@/components/primitives";
 
 export default function Home() {
   const [word, setWord] = useState('');
@@ -37,7 +38,6 @@ export default function Home() {
   };
 
   const handleSaveWord = async () => {
-    if (!definition) return;
 
     // For simplicity, we'll save the first definition from the first meaning.
     const payload = {
@@ -55,7 +55,7 @@ export default function Home() {
       if (result.success) {
         setMessage('Word saved successfully!');
       } else {
-        setMessage('Failed to save word.');
+        setMessage('Word already Exist! or Server Error');
       }
     } catch (err) {
       console.error('Failed to save word', err);
@@ -65,28 +65,39 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
-     
+
       <div className="absolute top-4 right-4">
         <Link
-        href={"words"}
+          href={"words"}
 
           onClick={() => setDarkMode(!darkMode)}        >
-            <button type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Saved Words</button>
+          <button type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Saved Word</button>
 
-      </Link>
+        </Link>
       </div>
-      <h1 className="mb-8 text-4xl font-bold">Harendra Dictionary App</h1>
+     <span className='p-8'><h1 className={title({color:"violet"})}>Harendra Dictionary App</h1></span> 
       <form onSubmit={handleSearch} className="flex mb-8">
-        <Input
-          type="text"
-          value={word}
-          onChange={(e) => setWord(e.target.value)}
-          placeholder="Enter a word"
-          className="text-black rounded-l-lg focus:outline-none"
-        />
-        <Button type="submit" className="p-2 bg-blue-600 rounded-r-lg hover:bg-blue-700">
+        
+      <div className="flex items-center gap-4">
+
+<Input
+      isClearable
+      className="max-w-xs"
+      value={word}
+      onChange={(e) => setWord(e.target.value)}
+      placeholder="Enter a word"
+
+      type="text"
+      variant="bordered"
+      // eslint-disable-next-line no-console
+      onClear={() => setWord("")}
+    />
+    
+        <Button type="submit" variant='bordered'>
           Search
         </Button>
+        </div>
+
       </form>
       {error && <p className="text-red-500">{error}</p>}
       {definition && (
@@ -104,12 +115,10 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <button
-            onClick={handleSaveWord}
-            className="p-2 mt-4 bg-green-500 rounded hover:bg-green-600"
-          >
-            Save Word
-          </button>
+          <Button onClick={handleSaveWord} color='success' variant='bordered'>
+          Save Word
+          </Button>
+       
           {message && <p className="mt-2">{message}</p>}
         </>
       )}

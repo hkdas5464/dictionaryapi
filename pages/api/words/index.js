@@ -50,12 +50,50 @@ export default async function handler(req, res) {
       console.error('Error fetching words:', error);
       return res.status(500).json({ error: 'Failed to fetch words' });
     }
+  }   
+
+
+
+
+  if (req.method === 'POST') {
+    const { word, definition } = req.body;
+
+    if (!word || !definition) {
+      return res.status(400).json({ error: 'Word and definition are required' });
+    }
+
+    try {
+      const client = await clientPromise;
+      const db = client.db('dictionaryDB'); // Replace with your DB name
+      const collection = db.collection('words');
+
+      const result = await collection.insertOne({
+        word,
+        definition,
+        createdAt: new Date(),
+      });
+
+      // Depending on your MongoDB driver version, result.ops may not be available.
+      const insertedWord = result.ops ? result.ops[0] : { word, definition };
+
+      return res.status(201).json({ success: true, data: insertedWord });
+    } catch (error) {
+      console.error('Error saving word:', error);
+      return res.status(500).json({ error: 'Error saving word' });
+    }
   } else {
+    res.setHeader('Allow', ['POST']);
     res.setHeader('Allow', ['GET']);
+
     return res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
+}
+  
+  
+  
+  
  
   
 
 
-}
+

@@ -43,23 +43,31 @@ export default function WordsPage() {
 
   // Delete a word
   const handleDelete = async (id) => {
-    try {
-      const res = await fetch(`/api/words/${id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error('Deletion error response:', errorData);
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      if (data.success) {
-        setWords(words.filter((word) => word._id !== id));
-      } else {
-        console.error('Deletion unsuccessful:', data.message);
-      }
-    } catch (err) {
-      setError(err.message);
-      console.error('Error deleting word:', err);
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this word? This action cannot be undone."
+    );
+    if (confirmed) {
+      try {
+        const res = await fetch(`/api/words/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('Deletion error response:', errorData);
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        if (data.success) {
+          setWords(words.filter((word) => word._id !== id));
+        } else {
+          console.error('Deletion unsuccessful:', data.message);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error('Error deleting word:', err);
+      };
     }
+
+   
   };
 
   // Update (edit) a word
@@ -112,7 +120,7 @@ export default function WordsPage() {
         )}
         {words.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {words.map((item,index) => (
+            {words.map((item, index) => (
               <Card
                 key={item._id}
                 className="text-white shadow-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-400"
@@ -158,16 +166,22 @@ export default function WordsPage() {
                 ) : (
                   <>
 
-                  
+
                     <CardHeader className="flex gap-3 text-center">
-                      <h2 className={title({ size: "sm" })}><span className='text-black'>{index+1} )</span> {item.word}</h2>
+                      <h2 className={title({ size: "sm" })}><span className='text-black'>{index + 1} )</span> {item.word}</h2>
 
                     </CardHeader>
                     <Divider />
 
                     <CardBody>
-                      <p className="text-gray-200">{item.definition}</p>
+                      <p className="text-gray-200 font-bold">{item.definition}</p>
+                      {item.example && (
+                        <p className="text-gray-200">
+                          <i>Example: {item.example}</i>
+                        </p>
+                      )}
                     </CardBody>
+
                     <CardFooter className="flex justify-end space-x-2">
                       <Button
                         onClick={() => {

@@ -4,7 +4,7 @@ module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@heroui/theme/dist/components/(button|card|divider|input|ripple|spinner|form).js"
+    "./node_modules/@heroui/theme/dist/components/(button|card|divider|input|listbox|table|ripple|spinner|form|checkbox|spacer).js"
   ],
   theme: {
     extend: {},

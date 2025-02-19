@@ -1,10 +1,8 @@
-
-
-import { Button, ButtonGroup } from '@heroui/button';
+import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { title, subtitle } from "@/components/primitives";
+import { title } from "@/components/primitives";
 
 export default function Home() {
   const [word, setWord] = useState('');
@@ -37,12 +35,39 @@ export default function Home() {
     }
   };
 
-  const handleSaveWord = async () => {
+  // Aggregate synonyms and antonyms from meanings and definitions.
+  let allSynonyms = [];
+  let allAntonyms = [];
+  if (definition) {
+    definition.meanings.forEach((meaning) => {
+      if (meaning.synonyms && meaning.synonyms.length > 0) {
+        allSynonyms = allSynonyms.concat(meaning.synonyms);
+      }
+      if (meaning.antonyms && meaning.antonyms.length > 0) {
+        allAntonyms = allAntonyms.concat(meaning.antonyms);
+      }
+      meaning.definitions.forEach((def) => {
+        if (def.synonyms && def.synonyms.length > 0) {
+          allSynonyms = allSynonyms.concat(def.synonyms);
+        }
+        if (def.antonyms && def.antonyms.length > 0) {
+          allAntonyms = allAntonyms.concat(def.antonyms);
+        }
+      });
+    });
+  }
+  const uniqueSynonyms = Array.from(new Set(allSynonyms));
+  const uniqueAntonyms = Array.from(new Set(allAntonyms));
 
-    // For simplicity, we'll save the first definition from the first meaning.
+  const handleSaveWord = async () => {
+    if (!definition) return;
+    // Prepare the payload including synonyms, antonyms, and example (from the first definition if available).
     const payload = {
       word: definition.word,
-      definition: definition.meanings[0].definitions[0].definition,
+      definition: definition.meanings[0]?.definitions[0]?.definition || "",
+      example: definition.meanings[0]?.definitions[0]?.example || "",
+      synonyms: uniqueSynonyms,
+      antonyms: uniqueAntonyms,
     };
 
     try {
@@ -55,7 +80,7 @@ export default function Home() {
       if (result.success) {
         setMessage('Word saved successfully!');
       } else {
-        setMessage('Word already Exist! or Server Error');
+        setMessage('Word already exists or server error occurred.');
       }
     } catch (err) {
       console.error('Failed to save word', err);
@@ -65,39 +90,35 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
-
       <div className="absolute top-4 right-4">
-        <Link
-          href={"words"}
-
-          onClick={() => setDarkMode(!darkMode)}        >
-          <button type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Saved Word</button>
-
+        <Link href="words" onClick={() => setDarkMode(!darkMode)}>
+          <button 
+            type="button" 
+            className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+          >
+            Saved Word
+          </button>
         </Link>
       </div>
-     <span className='p-8'><h1 className={title({color:"violet"})}>Harendra Dictionary App</h1></span> 
+      <span className="p-8">
+        <h1 className={title({ color: "violet" })}>Harendra Dictionary App</h1>
+      </span>
       <form onSubmit={handleSearch} className="flex mb-8">
-        
-      <div className="flex items-center gap-4">
-
-<Input
-      isClearable
-      className="max-w-xs"
-      value={word}
-      onChange={(e) => setWord(e.target.value)}
-      placeholder="Enter a word"
-
-      type="text"
-      variant="bordered"
-      // eslint-disable-next-line no-console
-      onClear={() => setWord("")}
-    />
-    
-        <Button type="submit" variant='bordered'>
-          Search
-        </Button>
+        <div className="flex items-center gap-4">
+          <Input
+            isClearable
+            className="max-w-xs"
+            value={word}
+            onChange={(e) => setWord(e.target.value)}
+            placeholder="Enter a word"
+            type="text"
+            variant="bordered"
+            onClear={() => setWord("")}
+          />
+          <Button type="submit" variant="bordered">
+            Search
+          </Button>
         </div>
-
       </form>
       {error && <p className="text-red-500">{error}</p>}
       {definition && (
@@ -109,16 +130,48 @@ export default function Home() {
                 <p className="italic">{meaning.partOfSpeech}</p>
                 <ul className="ml-6 list-disc">
                   {meaning.definitions.map((def, i) => (
-                    <li key={i} className="mb-1">{def.definition}</li>
+                    <li key={i} className="mb-1">
+                      <p>{def.definition}</p>
+                      {def.example && (
+                        <p className="ml-4 text-sm italic text-gray-300">
+                          <strong>Example:</strong> {def.example}
+                        </p>
+                      )}
+                    </li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <Button onClick={handleSaveWord} color='success' variant='bordered'>
-          Save Word
+          <div className="max-w-xl mt-4 flex flex-col md:flex-row gap-4">
+            <div>
+              <h3 className="text-xl font-bold mb-2">Synonyms</h3>
+              {uniqueSynonyms.length > 0 ? (
+                <ul className="list-disc pl-5">
+                  {uniqueSynonyms.map((synonym, idx) => (
+                    <li key={idx}>{synonym}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>N/A</p>
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-2">Antonyms</h3>
+              {uniqueAntonyms.length > 0 ? (
+                <ul className="list-disc pl-5">
+                  {uniqueAntonyms.map((antonym, idx) => (
+                    <li key={idx}>{antonym}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>N/A</p>
+              )}
+            </div>
+          </div>
+          <Button onClick={handleSaveWord} color="success" variant="bordered">
+            Save Word
           </Button>
-       
           {message && <p className="mt-2">{message}</p>}
         </>
       )}

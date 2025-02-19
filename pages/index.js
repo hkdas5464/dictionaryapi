@@ -3,6 +3,7 @@ import { Input } from '@heroui/input';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { title } from "@/components/primitives";
+import { Spotlight } from '@/components/ui/Spotlight';
 
 export default function Home() {
   const [word, setWord] = useState('');
@@ -90,6 +91,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
+       <Spotlight
+        className="left-0 -top-40 md:left-60 md:-top-20"
+        fill="blue"
+      />
       <div className="absolute top-4 right-4">
         <Link href="words" onClick={() => setDarkMode(!darkMode)}>
           <button 
@@ -143,11 +148,11 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="max-w-xl mt-4 flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col max-w-xl gap-4 mt-4 md:flex-row">
             <div>
-              <h3 className="text-xl font-bold mb-2">Synonyms</h3>
+              <h3 className="mb-2 text-xl font-bold">Synonyms</h3>
               {uniqueSynonyms.length > 0 ? (
-                <ul className="list-disc pl-5">
+                <ul className="pl-5 list-disc">
                   {uniqueSynonyms.map((synonym, idx) => (
                     <li key={idx}>{synonym}</li>
                   ))}
@@ -157,9 +162,9 @@ export default function Home() {
               )}
             </div>
             <div>
-              <h3 className="text-xl font-bold mb-2">Antonyms</h3>
+              <h3 className="mb-2 text-xl font-bold">Antonyms</h3>
               {uniqueAntonyms.length > 0 ? (
-                <ul className="list-disc pl-5">
+                <ul className="pl-5 list-disc">
                   {uniqueAntonyms.map((antonym, idx) => (
                     <li key={idx}>{antonym}</li>
                   ))}

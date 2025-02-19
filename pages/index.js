@@ -92,7 +92,7 @@ export default function Home() {
     <>
     
      
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden text-white bg-gray-900 h-[40rem] w-full rounded-md  md:items-center md:justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative ">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden antialiased bg-grid-white/[0.02] relative ">
     <Spotlight
         className="left-0 -top-40 md:left-60 md:-top-20"
         fill="blue"
@@ -177,9 +177,11 @@ export default function Home() {
               )}
             </div>
           </div>
-          <Button onClick={handleSaveWord} color="success" variant="bordered">
+         <div className='pt-2 pb-2'>
+         <Button onClick={handleSaveWord} color="success" variant="bordered">
             Save Word
           </Button>
+         </div>
           {message && <p className="mt-2">{message}</p>}
         </>
       )}

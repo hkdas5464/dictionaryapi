@@ -90,11 +90,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
+    <>
        <Spotlight
-        className="left-0 -top-40 md:left-60 md:-top-20"
         fill="blue"
       />
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
+    
       <div className="absolute top-4 right-4">
         <Link href="words" onClick={() => setDarkMode(!darkMode)}>
           <button 
@@ -181,5 +182,6 @@ export default function Home() {
         </>
       )}
     </div>
+    </>
   );
 }

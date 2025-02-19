@@ -232,7 +232,7 @@ export default function WordsPage() {
                         </h3>
 
                         {item.example && (
-                          <p className="text-gray-200">
+                          <p className="mt-2 font-medium text-green-500 text-large">
                             <i>Example: {item.example}</i>
                           </p>
                         )}

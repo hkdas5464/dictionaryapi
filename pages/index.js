@@ -3,6 +3,7 @@ import { Input } from '@heroui/input';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { title } from "@/components/primitives";
+import { Spotlight } from '@/components/ui/Spotlight';
 export default function Home() {
   const [word, setWord] = useState('');
   const [definition, setDefinition] = useState(null);
@@ -89,8 +90,13 @@ export default function Home() {
 
   return (
     <>
+    
      
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-white bg-gray-900">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden text-white bg-gray-900 h-[40rem] w-full rounded-md  md:items-center md:justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative ">
+    <Spotlight
+        className="left-0 -top-40 md:left-60 md:-top-20"
+        fill="blue"
+      />
     
       <div className="absolute top-4 right-4">
         <Link href="words" onClick={() => setDarkMode(!darkMode)}>
